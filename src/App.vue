@@ -1,47 +1,34 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <input type="text" v-model="myTodo" />
+  <button @click="addTodo">Add Todo</button>
+  <div v-if="!isEmpty">
+    <p v-for="(todo, index) in todos" :key="index">
+      {{ index }}. {{ todo }} <button @click="removeTodo(index)">delete</button>
+    </p>
+  </div>
+  <div v-else>No todos found</div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
+<script>
+import { computed, ref } from "vue";
+import { useMainStore } from "./store.js";
+export default {
+  setup() {
+    const main = useMainStore();
+    const myTodo = ref("");
+    const addTodo = () => {
+      if (myTodo.value != "") {
+        main.addTodo(myTodo.value);
+        myTodo.value = "";
+      }
+    };
+    return {
+      addTodo,
+      myTodo,
+      todos: computed(() => main.getAllTodos),
+      isEmpty: computed(() => main.todoEmpty),
+      removeTodo: main.removeTodo,
+    };
+  },
+};
+</script>
